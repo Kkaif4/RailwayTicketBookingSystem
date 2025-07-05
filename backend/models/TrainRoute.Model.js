@@ -24,6 +24,10 @@ const routeSchema = new mongoose.Schema(
         availableSeats: {
           type: Number,
         },
+        stationsOrder: {
+          type: Number,
+          required: true,
+        },
         //! Still in edit
       },
     ],
@@ -33,3 +37,4 @@ const routeSchema = new mongoose.Schema(
 
 const Route = mongoose.model('Route', routeSchema);
 export default Route;
+

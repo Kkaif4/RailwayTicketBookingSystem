@@ -1,10 +1,12 @@
 import express from 'express';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
-
+import TrainRoute from './routes/trainRoutes.js';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/trains', TrainRoute);
 
 app.get('/', (req, res) => {
   res.json({ message: 'root API hit, Hi' });
@@ -17,6 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.use(errorHandler);
+
 app.listen(process.env.PORT, () => {
   connectDB();
   console.log(`server is listening on port ${process.env.PORT}`);

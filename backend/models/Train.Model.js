@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 const trainSchema = new mongoose.Schema(
   {
     trainNumber: {
@@ -15,7 +14,7 @@ const trainSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    mainDestination: {
+    mainDest: {
       type: String,
       required: true,
     },
@@ -23,7 +22,7 @@ const trainSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    destinationArrivalTime: {
+    destArrivalTime: {
       type: Date,
       required: true,
     },
