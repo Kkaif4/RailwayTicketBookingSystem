@@ -1,30 +1,55 @@
 import Train from '../models/Train.Model.js';
 import Station from '../models/Station.Model.js';
+import TrainRoutes from '../models/TrainRoute.Model.js';
 // @params - train name, id, source, destination, time for D/A, seat no.
 export const addTrain = async (req, res, next) => {
   const { trainName, source, destination, arrival, departure, totalSeats } =
     req.body;
 
-  const train = Train.find({
+  const train = await Train.findOne({
     trainName,
     mainSource: source,
     mainDest: destination,
   });
   if (train) {
+    console.log(train);
     const error = new Error('Train already exist');
     error.status = 400;
     return next(error);
   }
   try {
-    const sourceStation = SchemaTypeOptions.findOne({ name: source });
-    const destStation = SchemaTypeOptions.findOne({ name: destination });
+    const sourceStation = Station.findOne({ name: source });
+    const destStation = Station.findOne({ name: destination });
     if (!sourceStation || !destStation) {
       const error = new Error('Invalid source or destination station name');
       error.status = 400;
-      return error;
+      return next(error);
     }
-    const route = TrainRoutes.find().populate('stops.stations');
-    
+    const route = await TrainRoutes.findOne().populate('stops.stations');
+    if (!route) {
+      const error = new Error('Route not found');
+      error.status = 400;
+      return next(error);
+    }
+    const matchedRoute = route.find((route) => {
+      const sortedStops = [...route.stops].sort(
+        (a, b) => a.stationsOrder - b.stationsOrder
+      );
+      const firstStop = sortedStops[0];
+      const lastStop = sortedStops[sortedStops.length - 1];
+
+      return (
+        firstStop.station.name.toLowerCase() === source.toLowerCase() &&
+        lastStop.station.name.toLowerCase() === destination.toLowerCase()
+      );
+    });
+
+    if (!matchedRoute) {
+      const error = new Error('Route not found for this stations');
+      error.status = 400;
+      return next(error);
+    }
+
     const newTrain = {
       trainNumber: 100,
       trainName,
@@ -33,9 +58,22 @@ export const addTrain = async (req, res, next) => {
       sourceDeparture: departure,
       destArrival: arrival,
       totalSeats,
-      routes: route._id,
+      routes: matchedRoute._id,
     };
-  } catch (error) {}
+    console.log(newTrain);
+    const one = await Train.create(newTrain);
+    res.json({
+      message: 'train created',
+      data: one.trainName,
+      success: true,
+    });
+  } catch (err) {
+    const error = new Error(
+      err.message || 'Internal server error in adding train'
+    );
+    error.status = 500;
+    return next(error);
+  }
 };
 
 //getting all trains
