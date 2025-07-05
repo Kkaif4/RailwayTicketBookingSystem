@@ -14,18 +14,20 @@ export const checkAddTrain = (req, res, next) => {
     return next(error);
   }
   if (
-    trainName !== typeof 'string' ||
+    typeof trainName !== 'string' ||
     trainName.trim() === '' ||
-    source !== typeof 'string' ||
+    typeof source !== 'string' ||
     source.trim() === '' ||
-    destination !== typeof 'string' ||
+    typeof destination !== 'string' ||
     destination.trim() === ''
   ) {
-    const error = new Error('Data is invalid');
+    const error = new Error('hello Data is invalid');
     error.status = 400;
     return next(error);
   }
-  if (!isDate(arrival) || !isDate(departure)) {
+  const A = new Date(arrival);
+  const D = new Date(departure);
+  if (!(A instanceof Date) || !(D instanceof Date)) {
     const error = new Error('time is not valid');
     error.status = 400;
     return next(error);
