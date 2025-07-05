@@ -15,11 +15,6 @@ const trainScheduleSchema = new mongoose.Schema(
       ref: 'Route',
       required: true,
     },
-    status: {
-      type: String,
-      enum: ['on-time', 'delayed', 'cancelled'],
-      default: 'on-time',
-    },
   },
   { timestamps: true }
 );
