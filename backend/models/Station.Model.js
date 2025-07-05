@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const stationSchema = new mongoose.Schema(
   {
-    name: {
+    stationName: {
       type: String,
       required: true,
       lowercase: true,
@@ -16,5 +16,5 @@ const stationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Station = mongoose.model('Station', stationSchema);
+const Station = mongoose.model("Station", stationSchema);
 export default Station;

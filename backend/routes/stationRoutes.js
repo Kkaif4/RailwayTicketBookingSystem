@@ -1,17 +1,19 @@
 import express from "express";
 import {
-  createStation,
-  deleteStation,
-  getStationById,
   getStations,
+  getStationById,
+  createStation,
   updateStation,
-} from "../controller/stationController.js";
+  deleteStation,
+} from "../controllers/stationController.js";
+import { validateStationInput } from "../middleware/validateStation.js";
 
 const router = express.Router();
-router.post("/", createStation); //create a station
-router.get("/", getStations); //get all stations
-router.get("/:id", getStationById); //get station by id
-router.put("/:id", updateStation); //update a station
-router.delete("/:id", deleteStation); //delete a station
+
+router.post("/", validateStationInput, createStation); // create a station
+router.get("/", getStations); // get all stations
+router.get("/:id", getStationById); // get station by id
+router.put("/:id", validateStationInput, updateStation); // update a station
+router.delete("/:id", deleteStation); // delete a station
 
 export default router;
