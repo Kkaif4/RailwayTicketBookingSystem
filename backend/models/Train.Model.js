@@ -40,12 +40,6 @@ const trainSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    seats: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Seat',
-      },
-    ],
   },
   { timestamps: true }
 );
