@@ -28,7 +28,6 @@ const routeSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
-        //! Still in edit
       },
     ],
   },

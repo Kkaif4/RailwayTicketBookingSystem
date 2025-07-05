@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 const seatSchema = new mongoose.Schema(
   {
     train: {

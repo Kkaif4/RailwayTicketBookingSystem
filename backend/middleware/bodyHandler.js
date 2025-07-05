@@ -39,3 +39,20 @@ export const checkAddTrain = (req, res, next) => {
   }
   next();
 };
+
+export const checkAddRoute = (req, res, next) => {
+  const { stationArray } = req.body;
+  if (!stationArray) {
+    const error = new Error('stations are not valid');
+    error.status = 400;
+    return next(error);
+  }
+  // const station = stationArray.map((s) => {
+  //   if (typeof s !== 'object') {
+  //     const error = new Error('wrong input in stations array');
+  //     error.status = 400;
+  //     return next(error);
+  //   }
+  // });
+  next();
+};
