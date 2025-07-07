@@ -1,5 +1,5 @@
-import TrainRoutes from '../models/TrainRoute.Model.js';
-import Station from '../models/Station.Model.js';
+import TrainRoutes from "../models/TrainRoute.Model.js";
+import Station from "../models/Station.Model.js";
 //create route
 // @body - list of stations with A/D time, order of stations
 export const setRoutes = async (req, res, next) => {
@@ -9,7 +9,7 @@ export const setRoutes = async (req, res, next) => {
     !Array.isArray(stationArray) ||
     stationArray.length < 2
   ) {
-    const error = new Error('At least two stations are required');
+    const error = new Error("At least two stations are required");
     error.status = 400;
     return next(error);
   }
@@ -23,7 +23,6 @@ export const setRoutes = async (req, res, next) => {
         departureTime,
         distanceFromSource,
         stationsOrder,
-        availableSeats,
       } = stop;
       console.log(name.toLowerCase());
       const station = await Station.findOne({
@@ -38,14 +37,13 @@ export const setRoutes = async (req, res, next) => {
         departureTime: new Date(departureTime),
         distanceFromSource,
         stationsOrder,
-        availableSeats,
       });
     }
     const newRoute = new TrainRoutes({ stops: stations });
     const savedRoutes = await newRoute.save();
-    res.json({ message: 'route created', data: savedRoutes, success: true });
+    res.json({ message: "route created", data: savedRoutes, success: true });
   } catch (err) {
-    const error = new Error(err.message || 'something went wrong in setRoute');
+    const error = new Error(err.message || "something went wrong in setRoute");
     return next(error);
   }
 };
