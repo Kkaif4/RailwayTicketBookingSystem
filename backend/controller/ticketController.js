@@ -14,7 +14,7 @@ export const bookTicket = async (req, res, next) => {
   
       //Fetch train with populated routes and stops
       const train = await Train.findById(trainId).populate({
-        path: 'routes',
+        path: 'route',
         populate: {
           path: 'stops.station',
         },
@@ -26,7 +26,7 @@ export const bookTicket = async (req, res, next) => {
             return next(error);
         } 
   
-      const route = train.routes[0];
+      const route = train.route;
         if (!route){ 
             const error = new Error("Route not found");
             error.status = 404;
@@ -35,10 +35,12 @@ export const bookTicket = async (req, res, next) => {
   
       const stops = route.stops;
   
+
       //Get source and destination stops
-      const sourceStop = stops.find((s) => s.station.code === source);
-      const destStop = stops.find((s) => s.station.code === destination);
-  
+      const sourceStop = stops.find(s => s.station.code.toLowerCase() === source.toLowerCase());
+      const destStop = stops.find(s => s.station.code.toLowerCase() === destination.toLowerCase());
+      
+
         if (!sourceStop || !destStop) {
             const error = new Error("Invalid source or destination");
             error.status = 400;
@@ -126,6 +128,7 @@ export const bookTicket = async (req, res, next) => {
       return res.status(201).json({ message: 'Ticket booked successfully', ticket });
 
     } catch (err) {
+      console.error('Booking error:', err);
         const error = new Error("Error while booking tickets");
         error.status = 400;
         return next(error);
