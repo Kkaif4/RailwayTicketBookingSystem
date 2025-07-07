@@ -1,12 +1,20 @@
 export const checkAddTrain = (req, res, next) => {
-  const { trainName, source, destination, arrival, departure, totalSeats } =
-    req.body;
+  const {
+    trainName,
+    source,
+    destination,
+    arrival,
+    departure,
+    runningDays,
+    totalSeats,
+  } = req.body;
   if (
     !trainName ||
     !source ||
     !destination ||
     !arrival ||
     !departure ||
+    !runningDays ||
     !totalSeats
   ) {
     const error = new Error('Data is invalid');
@@ -21,16 +29,37 @@ export const checkAddTrain = (req, res, next) => {
     typeof destination !== 'string' ||
     destination.trim() === ''
   ) {
-    const error = new Error('hello Data is invalid');
+    const error = new Error('Data is invalid');
     error.status = 400;
     return next(error);
   }
-  const A = new Date(arrival);
-  const D = new Date(departure);
-  if (!(A instanceof Date) || !(D instanceof Date)) {
-    const error = new Error('time is not valid');
+  if (!Array.isArray(runningDays)) {
+    const error = new Error('running day are not valid');
     error.status = 400;
     return next(error);
+  }
+
+  const days = [
+    'monday',
+    'sunday',
+    'wednesday',
+    'tuesday',
+    'thursday',
+    'friday',
+    'saturday',
+  ];
+  for (let RD of runningDays) {
+    if (typeof RD !== 'string') {
+      const error = new Error('running days are not valid');
+      error.status = 400;
+      return next(error);
+    }
+    if (!days.includes(RD.toLowerCase())) {
+      console.log(RD);
+      const error = new Error('running day is not valid');
+      error.status = 400;
+      return next(error);
+    }
   }
   if (isNaN(totalSeats)) {
     const error = new Error('seats are not valid');

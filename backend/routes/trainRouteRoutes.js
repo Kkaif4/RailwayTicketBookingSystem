@@ -4,7 +4,7 @@ import { setRoutes } from '../controller/trainRouteController.js';
 
 const router = express.Router();
 
-// router.get('/');
+// router.get('/',);
 router.post('/create-route', checkAddRoute, setRoutes);
 
 export default router;
