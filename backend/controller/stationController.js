@@ -1,92 +1,143 @@
-import mongoose from 'mongoose';
-import Station from '../models/Station.Model.js';
+import mongoose from "mongoose";
+import Station from "../models/Station.Model.js";
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!message!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//add error handling and
-// validation in this station controller.
-// user next and add middleware to validation
-//check api before pushing
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!message!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-//create a station
-export const createStation = async (req, res) => {
+// Create a station
+export const createStation = async (req, res, next) => {
   try {
-    const { name, code } = req.body;
+    const { stationName, code } = req.body;
 
-    const existing = await Station.findOne({ $or: [({ name }, { code })] });
+    if (!stationName || !code) {
+      const error = new Error("Station name and code are required");
+      error.status = 400;
+      return next(error);
+    }
+
+    const existing = await Station.findOne({
+      $or: [{ stationName }, { code }],
+    });
+
     if (existing) {
-      res.status(400).json({ message: 'Station already exists' });
+      const error = new Error("Station already exists");
+      error.status = 400;
+      return next(error);
     }
-    const station = await Station.create({ name, code });
-    res.status(201).json(station);
+
+    const station = await Station.create({ stationName, code });
+    res.status(201).json({ success: true, data: station });
   } catch (err) {
-    res.status(500), json({ message: err.message });
+    next(err);
   }
 };
 
-//get all stations
-export const getStations = async (req, res) => {
+// @desc    Fetch all stations
+//          Supports (optional) search by station name and pagination
+// @route   GET /stations
+// @query   ?search=string&page=number&limit=number
+export const getStations = async (req, res, next) => {
   try {
-    const stations = await Station.find();
-    res.json(stations);
+    const { search, page = 1, limit = 10 } = req.query;
+
+    const query = {};
+    if (search) {
+      query.stationName = { $regex: search, $options: "i" };
+    }
+
+    const totalStations = await Station.countDocuments(query);
+    const totalPages = Math.ceil(totalStations / limit);
+    const currentPage = Number(page);
+
+    if (currentPage < 1 || currentPage > totalPages) {
+      const error = new Error("Invalid page or limit number");
+      error.status = 400;
+      return next(error);
+    }
+
+    const stations = await Station.find(query)
+      .skip((currentPage - 1) * limit)
+      .limit(Number(limit));
+
+    res.status(200).json({
+      success: true,
+      totalStations,
+      totalPages,
+      currentPage,
+      data: stations,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-//get single station by id
-
-export const getStationById = async (req, res) => {
+// Get single station by ID
+export const getStationById = async (req, res, next) => {
   try {
-    //validate mongodb object id (as per mongodb id format)
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ message: 'invalid station id' });
-    }
-    //get station id from url
-    const station = await Station.findById(req.params.id);
+    const { id } = req.params;
 
-    //if the station with req id isn't found
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      const error = new Error("Invalid station ID");
+      error.status = 400;
+      return next(error);
+    }
+
+    const station = await Station.findById(id);
+
     if (!station) {
-      res.status(404).json({ message: 'Station with this id is not found' });
+      const error = new Error("Station not found");
+      error.status = 404;
+      return next(error);
     }
-    //if found ,return the station
-    res.json(station);
+
+    res.json({ success: true, data: station });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-//update a station
-export const updateStation = async (req, res) => {
+// Update a station
+export const updateStation = async (req, res, next) => {
   try {
-    const { name, code } = req.body;
+    const { id } = req.params;
+    const { stationName, code } = req.body;
+
+    if (!stationName || !code) {
+      const error = new Error("Station name and code are required");
+      error.status = 400;
+      return next(error);
+    }
+
     const station = await Station.findByIdAndUpdate(
-      //it returns the updated document,after searching the id from params and putting re.body data there
-      req.params.id,
-      { name, code },
+      id,
+      { stationName, code },
       { new: true }
     );
+
     if (!station) {
-      //if findByIdAndUpdate returned null(due to user provided id not found in Station)
-      res.status(404).json({ message: 'Station not found' });
+      const error = new Error("Station not found");
+      error.status = 404;
+      return next(error);
     }
-    res.json(station);
+
+    res.json({ success: true, data: station });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-//delete a station
-export const deleteStation = async (req, res) => {
+// Delete a station
+export const deleteStation = async (req, res, next) => {
   try {
-    const station = await Station.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+
+    const station = await Station.findByIdAndDelete(id);
+
     if (!station) {
-      res.status(404).json({ message: 'Station Not Found or already deleted' });
+      const error = new Error("Station not found or already deleted");
+      error.status = 404;
+      return next(error);
     }
-    res.json({ message: 'Station deleted successfully' });
+
+    res.json({ success: true, message: "Station deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
-
-//
