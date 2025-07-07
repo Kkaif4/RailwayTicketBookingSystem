@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 const ticketSchema = new mongoose.Schema(
   {
     train: {
@@ -8,11 +10,6 @@ const ticketSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-    },
-    seat: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Seat',
       required: true,
     },
     source: {
@@ -27,10 +24,47 @@ const ticketSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    distance: {
+      type: Number,
+      required: true,
+    },
     price: {
       type: Number,
       required: true,
     },
+    passengers: [
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+        age: {
+          type: Number,
+          required: true,
+        },
+        seat: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Seat',
+          required: true,
+        },
+      }
+    ],
+    arrivalTime: {
+      type: Date,
+      required: true
+    },
+    departureTime: {
+      type: Date,
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ['Booked', 'Cancelled'],
+      default: 'Booked'
+    }
   },
   { timestamps: true }
 );
+
+const Ticket = mongoose.model('Ticket', ticketSchema);
+export default Ticket;

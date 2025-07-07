@@ -5,7 +5,7 @@ import {
   getStationById,
   getStations,
   updateStation,
-} from '../controllers/stationController.js';
+} from '../controller/stationController.js';
 
 const router = express.Router();
 

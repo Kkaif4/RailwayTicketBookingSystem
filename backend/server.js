@@ -1,14 +1,11 @@
 import express from 'express';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import TrainRoute from './routes/trainRoutes.js';
 import TrainRouteRoutes from './routes/trainRouteRoutes.js';
-import express from 'express';
-import connectDB from './config/db.js';
 import TrainRoute from './routes/trainRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import stationRoutes from './routes/stationRoutes.js';
-
+import ticketRoutes from './routes/ticketRoutes.js';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,11 +22,10 @@ app.use('/api/trains/routes', TrainRouteRoutes);
 // train routes
 app.use('/api/trains', TrainRoute);
 
-//root api
-app.get('/', (req, res) => {
-  res.json({ message: 'root API hit, Hi' });
-});
+//ticket routes
+app.use('/tickets', ticketRoutes);
 
+//root api
 app.get('/', (req, res) => {
   res.json({ message: 'root API hit, Hi' });
 });
