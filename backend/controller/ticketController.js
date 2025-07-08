@@ -126,9 +126,9 @@ export const bookTicket = async (req, res, next) => {
       await User.findByIdAndUpdate(userId, { $push: { tickets: ticket._id } });
   
       await ticket.populate({
-        path: 'passengers.seat',
-        select: 'seatNumber',
-      });
+  path: 'passengers.seat',
+  select: 'seatNumber',
+});
 
       return res.status(201).json({ message: 'Ticket booked successfully', ticket, success: true });
 
@@ -245,9 +245,9 @@ export const cancelTicket = async (req, res, next) => {
       const stops = route.stops;
   
       //Find source and destination stops by code
-      const sourceStop = stops.find(s => s.station.code === ticket.source);
-      const destStop = stops.find(s => s.station.code === ticket.destination);
-  
+      const sourceStop = stops.find(s => s.station.code.toLowerCase() === ticket.source.toLowerCase());
+      const destStop = stops.find(s => s.station.code.toLowerCase() === ticket.destination.toLowerCase());
+      
       if (!sourceStop || !destStop) { 
         const error = new Error("Invalid Route Stops");
         error.status = 400;
