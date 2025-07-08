@@ -7,11 +7,11 @@ import jwt from 'jsonwebtoken';
 export const register = async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    const usernameRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{6,}$/;
+    const usernameRegex = /^(?=.*[A-Z])(?=.*[0-9]).{5,}$/;
     if (!usernameRegex.test(username)) {
       return next(
         new Error(
-          'Username must have one capital letter, one special character, one number, and be at least 6 characters long'
+          'Username must have one capital letter, one number, and be at least 5 characters long'
         )
       );
     }
