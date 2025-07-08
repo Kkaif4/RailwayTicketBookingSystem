@@ -125,7 +125,7 @@ export const bookTicket = async (req, res, next) => {
       //Add ticket to user
       await User.findByIdAndUpdate(userId, { $push: { tickets: ticket._id } });
   
-      return res.status(201).json({ message: 'Ticket booked successfully', ticket });
+      return res.status(201).json({ message: 'Ticket booked successfully', ticket, success: true });
 
     } catch (err) {
       console.error('Booking error:', err);
@@ -170,6 +170,7 @@ export const getMyTickets = async (req, res, next) => {
         totalPages: Math.ceil(total / limit),
         currentPage: parseInt(page),
         tickets,
+        success: true
       });
     
     } catch (err) {
@@ -199,7 +200,7 @@ export const singleTicket = async (req, res, next) => {
       return next(error);
     }
     
-    res.status(200).json({ ticket });
+    res.status(200).json({ ticket , success: true});
 
   } catch (err) {
     const error = new Error("Error fetching user tickets");
@@ -218,7 +219,7 @@ export const cancelTicket = async (req, res, next) => {
       //Find ticket by id & user
       const ticket = await Ticket.findOne({ _id: ticketId, user: userId }).populate({
         path: 'train',
-        populate: { path: 'routes' }
+        populate: { path: 'route' }
       });
   
         if (!ticket) { 
@@ -228,7 +229,7 @@ export const cancelTicket = async (req, res, next) => {
         } 
   
       //Get route & stops
-      const route = await Route.findById(ticket.train.routes[0]).populate('stops.station');
+      const route = await Route.findById(ticket.train.route).populate('stops.station');
   
         if (!route) { 
             const error = new Error("Route not found");
@@ -264,10 +265,9 @@ export const cancelTicket = async (req, res, next) => {
   
       //Mark ticket as cancelled
       ticket.status = 'Cancelled';
-      ticket.passengers = [];
       await ticket.save()
   
-      return res.json({ message: 'Ticket cancelled', ticket });
+      return res.json({ message: 'Ticket cancelled', ticket , success: true});
 
     } catch (err) {
         const error = new Error("Server Error");
