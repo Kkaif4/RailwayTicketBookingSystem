@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const stationSchema = new mongoose.Schema(
   {
-    stationName: {
+    name: {
       type: String,
       required: true,
       lowercase: true,

@@ -5,7 +5,7 @@ import {
   createStation,
   updateStation,
   deleteStation,
-} from "../controllers/stationController.js";
+} from "../controller/stationController.js";
 import { validateStationInput } from "../middleware/validateStation.js";
 
 const router = express.Router();
