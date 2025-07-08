@@ -8,13 +8,14 @@ const routeSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Station',
           required: true,
+          // unique: [true, 'hello double hai ye'],
         },
         arrivalTime: {
-          type: Date,
+          type: String,
           required: true,
         },
         departureTime: {
-          type: Date,
+          type: String,
           required: true,
         },
         distanceFromSource: {
@@ -30,10 +31,14 @@ const routeSchema = new mongoose.Schema(
         },
       },
     ],
+    routeCode: {
+      type: String,
+      unique: true,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
 const Route = mongoose.model('Route', routeSchema);
 export default Route;
-

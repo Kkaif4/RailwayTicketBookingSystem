@@ -8,25 +8,7 @@ const trainScheduleSchema = new mongoose.Schema(
     train: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Train',
-    },
-    trainName: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Train',
-      required: true,
-    },
-    stations: [
-      {
-        name: {
-          type: String,
-        },
-        arrival: {
-          type: String,
-        },
-        departure: {
-          type: String,
-        },
-      },
-    ],
+    }
   },
   { timestamps: true }
 );

@@ -15,7 +15,7 @@ export const setRoutes = async (req, res, next) => {
   }
   try {
     const stations = [];
-
+    let code = '';
     for (const stop of stationArray) {
       const {
         name,
@@ -24,6 +24,7 @@ export const setRoutes = async (req, res, next) => {
         distanceFromSource,
         stationsOrder,
       } = stop;
+
       const station = await Station.findOne({
         name: name.toLowerCase(),
       });
@@ -32,13 +33,14 @@ export const setRoutes = async (req, res, next) => {
       }
       stations.push({
         station: station._id,
-        arrivalTime: new Date(arrivalTime),
-        departureTime: new Date(departureTime),
+        arrivalTime,
+        departureTime,
         distanceFromSource,
         stationsOrder,
       });
+      code += station.name[0];
     }
-    const newRoute = new TrainRoutes({ stops: stations });
+    const newRoute = new TrainRoutes({ stops: stations, routeCode: code });
     const savedRoutes = await newRoute.save();
     res.json({ message: 'route created', data: savedRoutes, success: true });
   } catch (err) {

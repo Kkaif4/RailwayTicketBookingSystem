@@ -6,74 +6,13 @@ import TrainSchedule from '../models/TrainSchedule.Model.js';
 
 // @params - train name, id, source, destination, time for D/A, seat no.
 export const addTrain = async (req, res, next) => {
-  const {
-    trainName,
-    source,
-    destination,
-    arrival,
-    departure,
-    runningDays,
-    totalSeats,
-  } = req.body;
-
-  // checking if there is already train for the provided source and destination
-  const train = await Train.findOne({
-    trainName,
-    mainSource: source,
-    mainDest: destination,
-  });
-
-  // if found the existing train then return
-  if (train) {
-    console.log(train);
-    const error = new Error('Train already exist');
-    error.status = 400;
-    return next(error);
-  }
+  const { trainName, routeId, arrival, departure, runningDays, totalSeats } =
+    req.body;
   try {
-    const sourceStation = await Station.findOne({ name: source });
-    const destStation = await Station.findOne({ name: destination });
-
-    if (!sourceStation || !destStation) {
-      const error = new Error('Invalid source or destination station name');
-      error.status = 400;
-      return next(error);
-    }
-
-    //checking if routes available or not
-    const routes = await TrainRoutes.find().populate('stops.station');
-    if (!routes || !routes.length) {
-      const error = new Error('Route not found');
-      error.status = 400;
-      return next(error);
-    }
-    //finding matched routes for source and destination
-    const matchedRoute = routes.find((route) => {
-      const orderedStops = [...route.stops].sort(
-        (a, b) => a.stationsOrder - b.stationsOrder
-      );
-      const firstStop = orderedStops[0];
-      const lastStop = orderedStops[orderedStops.length - 1];
-      if (
-        firstStop.station.name === source &&
-        lastStop.station.name === destination
-      ) {
-        return true;
-      }
-      return false;
-    });
-
-    //check is we found the matched routes
-    if (!matchedRoute) {
-      const error = new Error(
-        'Route not found for this source and destination stations'
-      );
-      error.status = 400;
-      return next(error);
-    }
-
-    //creating new object for new train
-    const newTrain = {
+    const Route = await TrainRoutes.findOne({ _id: routeId });
+    const source = Route.stops[0].name;
+    const destination = Route.stops[Route.stops.length - 1].name;
+    const train = {
       trainNumber:
         source.charAt(0).toUpperCase() +
         destination.charAt(0).toUpperCase() +
@@ -86,14 +25,10 @@ export const addTrain = async (req, res, next) => {
       destArrivalTime: arrival,
       runningDays,
       totalSeats,
-      route: matchedRoute._id,
+      route: routeId,
     };
-
-    //saving train into db
-    const one = await Train.create(newTrain);
-    matchedRoute.availableSeats = totalSeats;
-    await matchedRoute.save();
-    // creating seats array and putting seats into Seats model
+    Route.stops.forEach((route) => (route.availableSeats = totalSeats));
+    const newTrain = await Train.create(train);
     const seats = [];
     for (let i = 1; i <= totalSeats; i++) {
       seats.push({
@@ -104,10 +39,25 @@ export const addTrain = async (req, res, next) => {
     }
     await Seat.insertMany(seats);
 
+    const newSchedule = await TrainSchedule.create({ date, train: one._id });
+    const route = newTrain.route;
+    await route.populate('stops.station');
+    const path = route.stops;
+    let stops = [];
+    path.forEach((stop) => {
+      stops.push(stop.station.name);
+    });
+    const Data = {
+      schedule: newSchedule.date,
+      Train_Name: train.trainName,
+      path: stops,
+    };
+
     //sending response
     res.json({
       message: 'train created',
       data: one.trainName,
+      schedule: Data,
       success: true,
     });
   } catch (err) {
@@ -230,11 +180,10 @@ export const getSearchTrainOld = async (req, res, next) => {
 };
 
 export const getSearchTrain = async (req, res, next) => {
-  const { source, destination, qDate = Date.now() } = req.query;
+  const { source, destination, date = Date.now() } = req.query;
 
   try {
-    const scdl = await TrainSchedule.find({}).populate('train');
-    console.log(scdl);
+    const schedule = await TrainSchedule.find({}).populate('train');
     res.json({ message: 'found schedule', success: true });
   } catch (err) {
     const error = new Error(
@@ -246,3 +195,8 @@ export const getSearchTrain = async (req, res, next) => {
 };
 //add route to train with routes id and train id
 export const addRouteToTrain = async () => {};
+
+// name validation
+// station validate
+// update existing routes
+// use id's

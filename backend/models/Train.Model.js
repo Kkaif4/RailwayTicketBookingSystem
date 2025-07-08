@@ -30,9 +30,11 @@ const trainSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    //one train only assigned for one route
     route: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Route',
+      unique: true,
     },
     runningDays: [{ type: String, required: true }],
     isActive: {
