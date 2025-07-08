@@ -125,6 +125,11 @@ export const bookTicket = async (req, res, next) => {
       //Add ticket to user
       await User.findByIdAndUpdate(userId, { $push: { tickets: ticket._id } });
   
+      await ticket.populate({
+        path: 'passengers.seat',
+        select: 'seatNumber',
+      });
+
       return res.status(201).json({ message: 'Ticket booked successfully', ticket, success: true });
 
     } catch (err) {
