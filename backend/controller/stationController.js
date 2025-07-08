@@ -4,16 +4,16 @@ import Station from "../models/Station.Model.js";
 // Create a station
 export const createStation = async (req, res, next) => {
   try {
-    const { stationName, code } = req.body;
+    const { name, code } = req.body;
 
-    if (!stationName || !code) {
+    if (!name || !code) {
       const error = new Error("Station name and code are required");
       error.status = 400;
       return next(error);
     }
 
     const existing = await Station.findOne({
-      $or: [{ stationName }, { code }],
+      $or: [{ name }, { code }],
     });
 
     if (existing) {
@@ -22,7 +22,7 @@ export const createStation = async (req, res, next) => {
       return next(error);
     }
 
-    const station = await Station.create({ stationName, code });
+    const station = await Station.create({ name, code });
     res.status(201).json({ success: true, data: station });
   } catch (err) {
     next(err);
@@ -35,12 +35,14 @@ export const createStation = async (req, res, next) => {
 // @query   ?search=string&page=number&limit=number
 export const getStations = async (req, res, next) => {
   try {
+    console.log("hello");
     const { search, page = 1, limit = 10 } = req.query;
 
     const query = {};
     if (search) {
-      query.stationName = { $regex: search, $options: "i" };
+      query.name = { $regex: search, $options: "i" };
     }
+    console.log(query);
 
     const totalStations = await Station.countDocuments(query);
     const totalPages = Math.ceil(totalStations / limit);
@@ -55,6 +57,7 @@ export const getStations = async (req, res, next) => {
     const stations = await Station.find(query)
       .skip((currentPage - 1) * limit)
       .limit(Number(limit));
+    console.log(stations);
 
     res.status(200).json({
       success: true,
@@ -97,27 +100,35 @@ export const getStationById = async (req, res, next) => {
 export const updateStation = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { stationName, code } = req.body;
+    const { name, code } = req.body;
 
-    if (!stationName || !code) {
+    // Check for valid ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      const error = new Error("Invalid station ID");
+      error.status = 400;
+      return next(error);
+    }
+
+    // validate request body
+    if (!name || !code) {
       const error = new Error("Station name and code are required");
       error.status = 400;
       return next(error);
     }
 
-    const station = await Station.findByIdAndUpdate(
+    const updated = await Station.findByIdAndUpdate(
       id,
-      { stationName, code },
+      { name, code },
       { new: true }
     );
 
-    if (!station) {
+    if (!updated) {
       const error = new Error("Station not found");
       error.status = 404;
       return next(error);
     }
 
-    res.json({ success: true, data: station });
+    res.json({ success: true, data: updated });
   } catch (err) {
     next(err);
   }
