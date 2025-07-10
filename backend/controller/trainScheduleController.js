@@ -1,11 +1,11 @@
 import Train from '../models/Train.Model.js';
 import TrainSchedule from '../models/TrainSchedule.Model.js';
-import TrainRoute from '../models/TrainRoute.Model.js';
-import Station from '../models/Station.Model.js';
 export const getSchedule = async (req, res, next) => {
   const { id } = req.params;
   try {
-    const schedule = await TrainSchedule.findOne({ _id: id });
+    const schedule = await TrainSchedule.findOne({ _id: id }).populate(
+      'train route'
+    );
     if (!schedule) {
       const error = new Error('schedule not found for this id');
       error.status = 201;
@@ -21,35 +21,53 @@ export const getSchedule = async (req, res, next) => {
   }
 };
 
-//! still in edit
 export const createSchedule = async (req, res, next) => {
-  const { trainId, date } = req.body;
+  const { trainId, date, departureTime, arrivalTime, stops } = req.body;
   try {
-    const train = await Train.findOne({ _id: trainId }).populate('route');
-    // console.log(train);
-    if (!train) {
-      const error = new Error('train not found');
-      error.status = 201;
-      return next(error);
-    }
-    const newSchedule = await TrainSchedule.create({ date, train: trainId });
-    const route = train.route;
-    await route.populate('stops.station');
-    const path = route.stops;
-    let stops = [];
-    path.forEach((stop) => {
-      stops.push(stop.station.name);
+    // Fetch the train to get totalSeats
+    const train = await Train.findById(trainId);
+    const addSeats = stops.map((stop) => ({
+      ...stop,
+      availableSeats: train.totalSeats,
+    }));
+    const schedule = new TrainSchedule({
+      train: trainId,
+      date: new Date(date),
+      departureTime,
+      arrivalTime,
+      stops: addSeats,
+      status: 'scheduled',
     });
-    console.log(stops);
-    const data = {
-      schedule: newSchedule,
-      Train_Name: train.trainName,
-      path: stops,
-    };
-    res.json({ message: 'Schedule created', data, success: true });
+    await schedule.save();
+    res.json({ message: 'Schedule created', data: schedule, success: true });
   } catch (err) {
     const error = new Error(
       err.message || 'something went wrong in create schedule'
+    );
+    error.status = 400;
+    return next(error);
+  }
+};
+
+export const deleteSchedule = async (req, res, next) => {
+  const today = Date.now();
+  const deletedDate = new Date(today);
+  try {
+    const result = await TrainSchedule.deleteMany({
+      date: { $lt: deletedDate },
+    });
+    if (result.deletedCount === 0) {
+      const error = new Error('No old schedules found to delete');
+      error.status = 404;
+      return next(error);
+    }
+    res.json({
+      message: `${result.deletedCount} old schedules deleted successfully`,
+      success: true,
+    });
+  } catch (err) {
+    const error = new Error(
+      err.message || 'something went wrong in delete schedule'
     );
     error.status = 400;
     return next(error);

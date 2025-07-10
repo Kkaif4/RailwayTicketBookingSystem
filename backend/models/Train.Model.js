@@ -18,23 +18,17 @@ const trainSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    sourceDepartureTime: {
-      type: String,
-      required: true,
-    },
-    destArrivalTime: {
-      type: String,
-      required: true,
-    },
+    // sourceDepartureTime: {
+    //   type: String,
+    //   required: true,
+    // },
+    // destArrivalTime: {
+    //   type: String,
+    //   required: true,
+    // },
     totalSeats: {
       type: Number,
       required: true,
-    },
-    //one train only assigned for one route
-    route: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Route',
-      unique: true,
     },
     runningDays: [{ type: String, required: true }],
     isActive: {

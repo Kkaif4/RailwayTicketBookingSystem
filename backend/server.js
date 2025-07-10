@@ -2,7 +2,6 @@ import express from 'express';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import TrainRoute from './routes/trainRoutes.js';
-import TrainRouteRoutes from './routes/trainRouteRoutes.js';
 import TrainSchedule from './routes/trainScheduleRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import stationRoutes from './routes/stationRoutes.js';
@@ -16,9 +15,6 @@ app.use('/api', authRoutes);
 
 //stations routes
 app.use('/api/stations', stationRoutes);
-
-//trainRoute routes
-app.use('/api/trains/routes', TrainRouteRoutes);
 
 // train routes
 app.use('/api/trains', TrainRoute);
