@@ -5,6 +5,7 @@ import TrainRoute from "./routes/trainRoutes.js";
 import TrainRouteRoutes from "./routes/trainRouteRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import stationRoutes from "./routes/stationRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -21,6 +22,9 @@ app.use("/api/trains/routes", TrainRouteRoutes);
 
 // train routes
 app.use("/api/trains", TrainRoute);
+
+//ticket routes
+app.use('/api/tickets', ticketRoutes);
 
 //root api
 app.get("/", (req, res) => {
