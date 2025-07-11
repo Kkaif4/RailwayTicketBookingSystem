@@ -110,11 +110,9 @@ export const bookTicket = async (req, res, next) => {
     const seatMap = {}; // seatId => array of [fromOrder, toOrder] booked segments
 
     for (const ticket of allBookedTickets) {
-      const tFrom = stops.find(s => s.station.code.toLowerCase() === ticket.source.toLowerCase())?.stationsOrder;
-      const tTo = stops.find(s => s.station.code.toLowerCase() === ticket.destination.toLowerCase())?.stationsOrder;
+      const tFrom = stops.find(s => s.station.code.toLowerCase() === ticket.source.toLowerCase());
+      const tTo = stops.find(s => s.station.code.toLowerCase() === ticket.destination.toLowerCase());
       
-      if (!tFrom || !tTo) continue; // safety check
-
       for (const passenger of ticket.passengers) {
         const seatId = passenger.seat.toString();
         if (!seatMap[seatId]) seatMap[seatId] = [];
@@ -142,7 +140,7 @@ export const bookTicket = async (req, res, next) => {
       const error = new Error("Not enough seats available for this segment");
       error.status = 400;
       return next(error);
-    }
+    };
 
     const passengerList = passengers.map((p, i) => ({
       name: p.name,
@@ -171,8 +169,7 @@ export const bookTicket = async (req, res, next) => {
     schedule.stops.forEach(stop => {
       if (stop.stationsOrder >= fromOrder && stop.stationsOrder < toOrder) {
         stop.availableSeats -= passengerCount;
-        if (stop.availableSeats < 0) stop.availableSeats = 0;//safety check
-      }
+      };
     });
 
     await schedule.save();
@@ -299,16 +296,11 @@ export const cancelTicket = async (req, res, next) => {
     // Increment available seats in schedule route stops for the booked segment
     schedule.stops.forEach(stop => {
       if (stop.stationsOrder >= fromOrder && stop.stationsOrder < toOrder) {
-        // Initialize if undefined
-        if (typeof stop.availableSeats !== 'number') {
-          stop.availableSeats = 0;
-        }
         stop.availableSeats += passengerCount;
-
-        // Optional safety: do not exceed train total seats
+        // do not exceed train total seats
         if (schedule.train && schedule.train.totalSeats && stop.availableSeats > schedule.train.totalSeats) {
           stop.availableSeats = schedule.train.totalSeats;
-        }
+        };
       }
     });
 
