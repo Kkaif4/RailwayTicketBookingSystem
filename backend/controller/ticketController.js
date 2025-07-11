@@ -64,7 +64,6 @@ export const bookTicket = async (req, res, next) => {
     const endOfDay = new Date(new Date(bookingDate).setHours(23, 59, 59, 999));
 
 
-    // Check if a schedule exists for that date
     const schedule = await TrainSchedule.findOne({
       train: trainId,
       status: 'scheduled',
@@ -264,7 +263,6 @@ export const cancelTicket = async (req, res, next) => {
       return next(error);
     }
 
-    // Find the schedule for this train and ticket date
     const schedule = await TrainSchedule.findOne({
       train: ticket.train._id,
       date: ticket.date,
@@ -293,11 +291,10 @@ export const cancelTicket = async (req, res, next) => {
     const toOrder = destStop.stationsOrder;
     const passengerCount = ticket.passengers.length;
 
-    // Increment available seats in schedule route stops for the booked segment
     schedule.stops.forEach(stop => {
       if (stop.stationsOrder >= fromOrder && stop.stationsOrder < toOrder) {
         stop.availableSeats += passengerCount;
-        // do not exceed train total seats
+        
         if (schedule.train && schedule.train.totalSeats && stop.availableSeats > schedule.train.totalSeats) {
           stop.availableSeats = schedule.train.totalSeats;
         };
