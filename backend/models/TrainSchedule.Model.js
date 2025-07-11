@@ -39,11 +39,6 @@ const trainScheduleSchema = new mongoose.Schema(
         },
       },
     ],
-    status: {
-      type: String,
-      enum: ['scheduled', 'cancelled', 'completed'],
-      default: 'scheduled',
-    },
   },
   { timestamps: true }
 );
