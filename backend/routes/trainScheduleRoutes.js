@@ -4,10 +4,18 @@ import {
   deleteSchedule,
   getSchedule,
 } from '../controller/trainScheduleController.js';
-import { scheduleCheck } from '../middleware/bodyHandler.js';
+import {
+  scheduleCheck,
+  validateScheduleDateAndOverlap,
+} from '../middleware/bodyHandler.js';
 const router = express.Router();
 
 router.get('/get-all-schedule/:trainId', getSchedule);
-router.post('/create-schedule', scheduleCheck, createSchedule);
+router.post(
+  '/create-schedule',
+  scheduleCheck,
+  validateScheduleDateAndOverlap,
+  createSchedule
+);
 router.delete('/delete', deleteSchedule);
 export default router;
