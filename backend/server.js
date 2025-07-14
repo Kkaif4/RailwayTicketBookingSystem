@@ -4,7 +4,9 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import TrainRoute from "./routes/trainRoutes.js";
 import TrainRouteRoutes from "./routes/trainRouteRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import {tokenVerification, isUserValid }from './middleware/authMiddleware.js'
 import stationRoutes from "./routes/stationRoutes.js";
+
 
 const app = express();
 app.use(express.json());
@@ -12,6 +14,12 @@ app.use(express.urlencoded({ extended: true }));
 
 //auth routes
 app.use("/api", authRoutes);
+
+//Token Verification
+app.use(tokenVerification)
+
+//User Validation
+app.use(isUserValid)
 
 //stations routes
 app.use("/api/stations", stationRoutes);
