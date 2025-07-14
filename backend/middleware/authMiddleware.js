@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import User from '../models/User.Model';
 
-const tokenVerification = (req, res, next) => {
+export const tokenVerification = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -17,4 +18,15 @@ const tokenVerification = (req, res, next) => {
   }
 };
 
-export default tokenVerification;
+export const isUserValid = async (req, res, next) => {
+  const { id } = req.user;
+  const user = await User.findById({ _id: id });
+  if (!user) {
+    const error = new Error('user not found');
+    error.status = 400;
+    return next(error);
+  }
+  
+  next();
+};
+
