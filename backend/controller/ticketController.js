@@ -97,7 +97,7 @@ export const bookTicket = async (req, res, next) => {
     const fromOrder = sourceStop.stationsOrder;
     const toOrder = destStop.stationsOrder;
 
-    if (fromOrder >= toOrder) {
+    if (fromOrder >= toOrder) { 
       const error = new Error("Invalid route direction");
       error.status = 400;
       return next(error);
@@ -182,7 +182,7 @@ export const bookTicket = async (req, res, next) => {
 
     res.status(201).json({ message: 'Ticket booked successfully', populatedTicket, success: true });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     const error = new Error("Error booking ticket");
     error.status = 500;
     return next(error);
@@ -313,7 +313,7 @@ export const cancelTicket = async (req, res, next) => {
     res.status(200).json({ message: 'Ticket cancelled successfully!', populatedTicket, success: true });
 
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     const error = new Error("Server error during cancellation");
     error.status = 500;
     return next(error);
