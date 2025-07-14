@@ -10,19 +10,16 @@ const routeSchema = new mongoose.Schema(
           required: true,
         },
         arrivalTime: {
-          type: Date,
+          type: String,
           required: true,
         },
         departureTime: {
-          type: Date,
+          type: String,
           required: true,
         },
         distanceFromSource: {
           type: Number,
           required: true,
-        },
-        availableSeats: {
-          type: Number,
         },
         stationsOrder: {
           type: Number,

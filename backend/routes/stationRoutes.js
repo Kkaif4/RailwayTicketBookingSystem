@@ -8,6 +8,7 @@ import {
 } from "../controller/stationController.js";
 import { validateStationInput } from "../middleware/validateStation.js";
 
+
 const router = express.Router();
 
 router.post("/", validateStationInput, createStation); // create a station
