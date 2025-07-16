@@ -1,5 +1,25 @@
 import Train from '../models/Train.Model.js';
 import TrainSchedule from '../models/TrainSchedule.Model.js';
+import Station from '../models/Station.Model.js';
+import { DateTime } from 'luxon';
+export const getAllSchedule = async (req, res, next) => {
+  try {
+    const schedules = await TrainSchedule.find({});
+    if (!schedules || schedules.length === 0) {
+      const error = new Error('No Schedule found');
+      error.status = 201;
+      return next(error);
+    }
+    res.json({ message: 'schedule found', data: schedules, success: true });
+  } catch (err) {
+    const error = new Error(
+      err.message || 'something wrong in the getAllSchedule'
+    );
+    error.status = 400;
+    return next(error);
+  }
+};
+
 export const getSchedule = async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -22,20 +42,26 @@ export const getSchedule = async (req, res, next) => {
 };
 
 export const createSchedule = async (req, res, next) => {
-  const { trainId, date, departureTime, arrivalTime, stops } = req.body;
+  const { startTime, endTime, date, timezone } = req.body;
+  const train = req.train;
+  const stops = req.stopsArray;
   try {
-    // Fetch the train to get totalSeats
-    const train = await Train.findById(trainId);
-    const addSeats = stops.map((stop) => ({
+    const stopsWithSeats = stops.map((stop) => ({
       ...stop,
       availableSeats: train.totalSeats,
     }));
+    const startUTC = DateTime.fromISO(startTime, { zone: timezone })
+      .toUTC()
+      .toJSDate();
+    const endUTC = DateTime.fromISO(endTime, { zone: timezone })
+      .toUTC()
+      .toJSDate();
     const schedule = new TrainSchedule({
-      train: trainId,
+      train: train._id,
       date: new Date(date),
-      departureTime,
-      arrivalTime,
-      stops: addSeats,
+      startTime: startUTC,
+      endTime: endUTC,
+      stops: stopsWithSeats,
       status: 'scheduled',
     });
     await schedule.save();

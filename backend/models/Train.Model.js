@@ -9,6 +9,7 @@ const trainSchema = new mongoose.Schema(
     trainName: {
       type: String,
       required: true,
+      unique: true,
     },
     mainSource: {
       type: String,
@@ -18,19 +19,10 @@ const trainSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // sourceDepartureTime: {
-    //   type: String,
-    //   required: true,
-    // },
-    // destArrivalTime: {
-    //   type: String,
-    //   required: true,
-    // },
     totalSeats: {
       type: Number,
       required: true,
     },
-    runningDays: [{ type: String, required: true }],
     isActive: {
       type: Boolean,
       default: true,

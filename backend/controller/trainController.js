@@ -5,7 +5,7 @@ import TrainSchedule from '../models/TrainSchedule.Model.js';
 
 // @params - train name, id, source, destination, time for D/A, seat no.
 export const addTrain = async (req, res, next) => {
-  const { trainName, runningDays, totalSeats, source, destination } = req.body;
+  const { trainName, totalSeats, source, destination } = req.body;
   try {
     const train = new Train({
       trainNumber:
@@ -14,9 +14,8 @@ export const addTrain = async (req, res, next) => {
         '-' +
         Math.floor(Math.random() * 1000),
       trainName,
-      mainSource: source,
-      mainDest: destination,
-      runningDays,
+      mainSource: source.toLowerCase(),
+      mainDest: destination.toLowerCase(),
       totalSeats,
     });
     const newTrain = await train.save();
@@ -29,10 +28,12 @@ export const addTrain = async (req, res, next) => {
       });
     }
     await Seat.insertMany(seats);
-
     res.json({
       message: 'train created',
-      data: newTrain.trainName,
+      data: {
+        name: newTrain.trainName,
+        number: newTrain.trainNumber,
+      },
       success: true,
     });
   } catch (err) {
@@ -200,8 +201,8 @@ export const getSearchTrain = async (req, res, next) => {
     return next(error);
   }
 };
-//add route to train with routes id and train id
 
+//add route to train with routes id and train id
 // name validation
 // station validate
 // update existing routes

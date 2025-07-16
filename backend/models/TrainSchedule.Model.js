@@ -10,6 +10,17 @@ const trainScheduleSchema = new mongoose.Schema(
       ref: 'Train',
       required: true,
     },
+    startTime: {
+      type: Date,
+      required: true,
+    },
+    endTime: {
+      type: Date,
+      required: true,
+    },
+    timeZone: {
+      type: String,
+    },
     stops: [
       {
         station: {

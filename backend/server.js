@@ -46,3 +46,12 @@ app.listen(process.env.PORT, () => {
   connectDB();
   console.log(`server is listening on port ${process.env.PORT}`);
 });
+
+
+// same train on difference timing and days
+// train should be flexible and not bounded by schedule
+// getTime - research. with time zone
+// get time,day,week -
+// test cases - 
+// race condition - transition
+// nest js - class validator, class transformer, id validation

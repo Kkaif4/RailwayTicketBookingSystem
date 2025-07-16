@@ -2,19 +2,21 @@ import express from 'express';
 import {
   createSchedule,
   deleteSchedule,
+  getAllSchedule,
   getSchedule,
 } from '../controller/trainScheduleController.js';
 import {
-  scheduleCheck,
-  validateScheduleDateAndOverlap,
+  validateStops,
+  validateTrainAndTime,
 } from '../middleware/bodyHandler.js';
 const router = express.Router();
 
-router.get('/get-all-schedule/:trainId', getSchedule);
+router.get('/get-schedules', getAllSchedule);
+router.get('/get-schedule/:trainId', getSchedule);
 router.post(
   '/create-schedule',
-  scheduleCheck,
-  validateScheduleDateAndOverlap,
+  validateTrainAndTime,
+  validateStops,
   createSchedule
 );
 router.delete('/delete', deleteSchedule);

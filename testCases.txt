@@ -1,0 +1,52 @@
+() Validation Edge Cases
+    -Missing required fields (e.g. missing train, date, or stops). 
+        done
+
+    -stops array has fewer than 2 entries (invalid rout).
+        done
+
+    -Station names not existing in the DB (invalid station reference).
+        done
+
+    -Non-unique or non-increasing stationsOrder value.
+        done
+    
+    -Invalid availableSeats (e.g., negative or greater than train total seat).
+        pending
+    
+    -departureTime < arrivalTime for a stop.
+        done
+    
+    -Overlapping arrivalTime and departureTime between two stops.
+        done
+    
+    -Arrival or departure times not in ISO format or invalid date.
+        done 
+    
+    -Duplicate station IDs in stops.
+        done 
+
+() Schedule Conflict Edge Cases
+    - Schedule for the same train on the same date already exists
+        pending
+    
+    - Overlapping schedule time with an existing schedule (conflict)
+        pending
+
+    - Schedule being created for a past date
+        done
+    
+    - preventing users from scheduling trains beyond 1 week
+        pending
+
+() Data Integrity Edge Cases
+    - train field references a non-existent train.
+        done
+
+    - One or more stops reference a deleted or missing station.
+
+    - arrivalTime and departureTime not in chronological order across stops.
+        pending
+
+    - Mismatched availableSeats across stops for same train.
+        pending
