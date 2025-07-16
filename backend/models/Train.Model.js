@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 const trainSchema = new mongoose.Schema(
   {
     trainNumber: {
@@ -9,6 +9,7 @@ const trainSchema = new mongoose.Schema(
     trainName: {
       type: String,
       required: true,
+      unique: true,
     },
     mainSource: {
       type: String,
@@ -18,21 +19,9 @@ const trainSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    sourceDepartureTime: {
-      type: Date,
-      required: true,
-    },
-    destArrivalTime: {
-      type: Date,
-      required: true,
-    },
     totalSeats: {
       type: Number,
       required: true,
-    },
-    route: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Route",
     },
     isActive: {
       type: Boolean,
@@ -42,5 +31,5 @@ const trainSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Train = mongoose.model("Train", trainSchema);
+const Train = mongoose.model('Train', trainSchema);
 export default Train;
